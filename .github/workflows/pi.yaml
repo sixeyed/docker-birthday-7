@@ -13,4 +13,4 @@ jobs:
         uses: docker://sixeyed/pi:2002
         with:
           entrypoint: /usr/bin/dotnet
-          args: Pi.Web.dll -m console -dp 1000
+          args: /app/Pi.Web.dll -m console -dp 1000
