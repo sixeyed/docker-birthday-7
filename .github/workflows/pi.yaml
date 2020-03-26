@@ -7,6 +7,8 @@ on:
 
 jobs:
   pi:
-    container:
-      image: sixeyed/pi:2002
-      options: -dp 1000
+    steps:
+      - name: Print Pi to 1,000 dp
+        uses: docker://sixeyed/pi:2002
+        with:
+          args: -dp 1000
