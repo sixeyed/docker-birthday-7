@@ -25,6 +25,10 @@ Walk through [pi.yaml](../../.github/workflows/pi.yaml)
 
 > Edit [run-pi.txt](run-pi.txt) and push to start; browse to https://github.com/sixeyed/docker-birthday-7
 
+##
+
+Badges! Add from run to 
+
 ## Something more complex...
 
 Walk through [aks-deploy.yaml](./samples/aks-deploy.yaml), and the [Dockerfile](./samples/aks-create-cluster/Dockerfile).
