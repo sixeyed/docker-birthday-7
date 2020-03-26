@@ -1,0 +1,76 @@
+name: Deploy to AKS
+
+on:
+  push:
+    paths:
+      - "src/**"
+
+env:
+  AZURE_SP_NAME: ${{ secrets.AZURE_SP_NAME }}
+  AZURE_SP_TENANT: ${{ secrets.AZURE_SP_TENANT }}
+  AZURE_SP_PASSWORD: ${{ secrets.AZURE_SP_PASSWORD }}
+  AZURE_SP_APP_ID: ${{ secrets.AZURE_SP_APP_ID }}
+  AZURE_REGION: westeurope
+  AZURE_RESOURCE_GROUP: demo
+  AKS_CLUSTER_NAME: demo-aks
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: demo.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: Build and push Docker images
+        run: |
+          docker-compose build
+          docker-compose push
+        working-directory: ./docker
+
+  create-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Create AKS cluster
+        uses: "docker://demo/actions-aks-create-cluster:2001"
+        env:
+          AKS_KUBERNETES_VERSION: "1.15.5"
+          AKS_NODE_COUNT: "2"
+          AKS_NODE_SIZE: "Standard_DS1_v2"
+      - name: Deploy Kubernetes namespaces
+        uses: "docker://demo/actions-aks-deploy:2001"
+        env:
+          MANIFEST_PATH: "./kubernetes/namespaces/"
+
+  create-secrets:
+    needs: [create-cluster]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Registry Secret - public
+        uses: "docker://demo/actions-aks-create-registry-secret:2001"
+        env:
+          NAMESPACE: "demo-public"
+          SECRET_NAME: "demo-acr-regcred"
+          REGISTRY_SERVER: "demo.azurecr.io"
+          REGISTRY_USERNAME: ${{ secrets.ACR_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+
+  deploy:
+    needs: [build, create-cluster]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Deploy Azure config
+        uses: "docker://demo/actions-aks-deploy:2001"
+        env:
+          MANIFEST_PATH: "./kubernetes/azure/"
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+      - name: Deploy API
+        uses: "docker://demo/actions-aks-deploy:2001"
+        env:
+          MANIFEST_PATH: "./kubernetes/api/"
