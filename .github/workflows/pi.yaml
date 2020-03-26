@@ -12,4 +12,5 @@ jobs:
       - name: Print Pi to 1,000 dp
         uses: docker://sixeyed/pi:2002
         with:
-          args: -dp 1000
+          entrypoint: dotnet Pi.Web.dll
+          args: -m console -dp 1000
