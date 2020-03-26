@@ -52,8 +52,10 @@ Prometheus is configured to scrape a target called `pi-wcf` but there's no DNS e
 
 ## Add a Kubernetes Service for the Windows container
 
+Use a [headless service](./specs/wcf/wcf-service-headless.yaml) for the Kube cluster to talk to the Windows container:
+
 ```
-kubectl apply -f ./wcf/wcf-service-headless.yaml
+kubectl apply -f ./specs/wcf/wcf-service-headless.yaml
 ```
 
 Check [targets](http://localhost:9090/targets) and [graph](http://localhost:9090) again - metrics for the Linux and Windows containers are there :)
