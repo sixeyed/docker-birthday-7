@@ -7,6 +7,7 @@ on:
 
 jobs:
   pi:
+    runs-on: ubuntu-latest
     steps:
       - name: Print Pi to 1,000 dp
         uses: docker://sixeyed/pi:2002
