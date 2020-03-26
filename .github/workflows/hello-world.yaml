@@ -1,0 +1,19 @@
+name: Hello World
+
+on:
+  push:
+    paths:
+      - "sessions/github-actions/run-hello-world.txt"
+
+jobs:
+  hello-world-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hello World - Linux
+        run: echo "Hello from $(hostname), running on $(uname -s -r -m)"
+
+  hello-world-windows:
+    runs-on: windows-2019
+    steps:
+      - name: Hello World - Windows
+        run: echo "Hello from $(hostname), running on Windows $([System.Environment]::OSVersion.Version)"

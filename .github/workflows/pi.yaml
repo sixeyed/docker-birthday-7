@@ -1,0 +1,12 @@
+name: Pi
+
+on:
+  push:
+    paths:
+      - "sessions/github-actions/run-pi.txt"
+
+jobs:
+  pi:
+    container:
+      image: sixeyed/pi:2002
+      options: -dp 1000
